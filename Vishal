@@ -1,0 +1,1839 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0f0f10">
+  <title>Japan 2026 — Grover Family</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ════════════════════════════════════════
+       DESIGN TOKENS
+    ════════════════════════════════════════ */
+    :root {
+      --bg: #f8f5f0;
+      --card: #ffffff;
+      --ink: #0f0f10;
+      --red: #c84b31;
+      --red-soft: #f5ede9;
+      --gold: #b8904a;
+      --sakura: #d4889a;
+      --text: #1a1a1a;
+      --muted: #6b7280;
+      --border: #e8e2d8;
+      --r: 16px;
+      --shadow: 0 1px 12px rgba(0,0,0,0.06);
+      --shadow-lg: 0 4px 28px rgba(0,0,0,0.1);
+
+      /* Status palette matching spreadsheet */
+      --s-confirmed: #15803d;   --s-confirmed-bg: #f0fdf4;
+      --s-requested: #0369a1;   --s-requested-bg: #f0f9ff;
+      --s-walkin: #6d28d9;      --s-walkin-bg: #f5f3ff;
+      --s-selfbook: #be185d;    --s-selfbook-bg: #fff1f2;
+      --s-suggest: #92400e;     --s-suggest-bg: #fffbeb;
+    }
+
+    /* ════════════════════════════════════════
+       RESET & BASE
+    ════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 16px; scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body {
+      font-family: 'Jost', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    a { text-decoration: none; }
+    button { font-family: inherit; }
+
+    /* ════════════════════════════════════════
+       SITE HEADER — STICKY
+    ════════════════════════════════════════ */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--ink);
+    }
+
+    .header-main {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 14px 20px 12px;
+    }
+
+    .header-brand {}
+    .header-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      color: #fff;
+      letter-spacing: 0.01em;
+      line-height: 1;
+    }
+    .header-sub {
+      font-size: 0.6rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.4);
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .header-clock {}
+    .clock-time {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: #fff;
+      line-height: 1;
+      text-align: right;
+    }
+    .clock-label {
+      font-size: 0.58rem;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      text-align: right;
+      margin-top: 3px;
+    }
+
+    /* Trip progress bar */
+    .progress-bar { height: 2px; background: rgba(255,255,255,0.08); }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--red), var(--gold));
+      transition: width 0.6s ease;
+      width: 0%;
+    }
+
+    /* Status ribbon */
+    .status-ribbon {
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.68rem;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.9);
+      background: var(--red);
+      transition: background 0.4s;
+    }
+    .status-ribbon.city-tokyo  { background: #1a3a5c; }
+    .status-ribbon.city-kyoto  { background: #3d1a48; }
+    .status-ribbon.pre-trip    { background: var(--gold); color: rgba(0,0,0,0.7); }
+    .status-ribbon.post-trip   { background: #374151; }
+
+    /* ════════════════════════════════════════
+       NAV TABS
+    ════════════════════════════════════════ */
+    .nav-tabs {
+      background: var(--card);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      position: sticky;
+      top: 88px; /* header height */
+      z-index: 100;
+    }
+    .nav-tabs::-webkit-scrollbar { display: none; }
+
+    .nav-tab {
+      flex: 1;
+      min-width: 70px;
+      padding: 11px 8px;
+      font-size: 0.63rem;
+      font-weight: 600;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      cursor: pointer;
+      border: none;
+      background: none;
+      border-bottom: 2px solid transparent;
+      transition: all 0.18s;
+      white-space: nowrap;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .nav-tab .tab-icon { display: block; font-size: 1rem; margin-bottom: 3px; }
+    .nav-tab.active { color: var(--red); border-bottom-color: var(--red); }
+
+    /* ════════════════════════════════════════
+       TAB PANELS
+    ════════════════════════════════════════ */
+    .tab-panel { display: none; padding: 20px 16px 40px; max-width: 680px; margin: 0 auto; }
+    .tab-panel.active { display: block; }
+
+    /* ════════════════════════════════════════
+       HERO CARD
+    ════════════════════════════════════════ */
+    .hero-card {
+      background: var(--ink);
+      border-radius: var(--r);
+      padding: 28px 24px 24px;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-card::before {
+      content: '日本';
+      position: absolute;
+      right: -8px; top: -18px;
+      font-size: 6.5rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.03);
+      font-family: serif;
+      pointer-events: none;
+      letter-spacing: -4px;
+    }
+    .hero-sakura {
+      position: absolute;
+      bottom: 16px; right: 20px;
+      font-size: 3rem;
+      opacity: 0.08;
+      pointer-events: none;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--red);
+      margin-bottom: 10px;
+    }
+    .hero-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 2.4rem;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .hero-cities {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1rem;
+      font-style: italic;
+      font-weight: 300;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 22px;
+    }
+
+    .hero-stats {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 18px;
+    }
+    .stat-box {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 10px 6px;
+      text-align: center;
+    }
+    .stat-val {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: #fff;
+      line-height: 1;
+    }
+    .stat-lbl {
+      font-size: 0.55rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+
+    .traveler-row { display: flex; flex-wrap: wrap; gap: 7px; }
+    .traveler-chip {
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 20px;
+      padding: 5px 13px;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.75);
+    }
+
+    /* Hotels row */
+    .hotels-row {
+      display: flex;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .hotel-pill {
+      flex: 1;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px 12px;
+    }
+    .hotel-pill-name {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: rgba(255,255,255,0.85);
+      margin-bottom: 2px;
+    }
+    .hotel-pill-dates {
+      font-size: 0.6rem;
+      color: rgba(255,255,255,0.35);
+      letter-spacing: 0.05em;
+    }
+
+    /* ════════════════════════════════════════
+       LEGEND
+    ════════════════════════════════════════ */
+    .legend-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 18px;
+    }
+    .legend-title {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .legend-chips { display: flex; flex-wrap: wrap; gap: 7px; }
+
+    /* ════════════════════════════════════════
+       DAY CARDS
+    ════════════════════════════════════════ */
+    .day-card {
+      background: var(--card);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      margin-bottom: 14px;
+      overflow: hidden;
+      animation: riseIn 0.4s ease both;
+    }
+    @keyframes riseIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .day-card:nth-child(1) { animation-delay: 0.05s; }
+    .day-card:nth-child(2) { animation-delay: 0.10s; }
+    .day-card:nth-child(3) { animation-delay: 0.15s; }
+    .day-card:nth-child(4) { animation-delay: 0.20s; }
+    .day-card:nth-child(5) { animation-delay: 0.25s; }
+    .day-card:nth-child(6) { animation-delay: 0.30s; }
+    .day-card:nth-child(7) { animation-delay: 0.35s; }
+    .day-card:nth-child(8) { animation-delay: 0.40s; }
+    .day-card:nth-child(9) { animation-delay: 0.45s; }
+
+    .day-card.today {
+      border-color: var(--red);
+      box-shadow: 0 4px 24px rgba(200,75,49,0.13);
+    }
+    .day-card.past { opacity: 0.75; }
+
+    .day-header {
+      padding: 18px 20px 14px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+    .day-header:active { background: #fafaf9; }
+
+    .day-left {}
+    .day-num-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+    .day-num-label {
+      font-size: 0.62rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+    .pill-today {
+      background: var(--red);
+      color: #fff;
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .pill-past {
+      background: #e5e7eb;
+      color: #9ca3af;
+      font-size: 0.52rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 20px;
+    }
+    .day-date-big {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.45rem;
+      font-weight: 500;
+      color: var(--text);
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+    .day-sublabel {
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .day-weather-mini {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.68rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .day-right {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 8px;
+      flex-shrink: 0;
+      margin-left: 10px;
+    }
+    .city-tag {
+      font-size: 0.62rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .city-tag.tokyo  { background: #dbeafe; color: #1d4ed8; }
+    .city-tag.kyoto  { background: #ede9fe; color: #6d28d9; }
+
+    .chevron {
+      font-size: 0.8rem;
+      color: var(--muted);
+      transition: transform 0.25s cubic-bezier(0.4,0,0.2,1);
+      margin-top: 4px;
+    }
+    .day-card.open .chevron { transform: rotate(180deg); }
+
+    /* Day Body */
+    .day-body {
+      display: none;
+      padding: 0 20px 22px;
+      border-top: 1px solid var(--border);
+    }
+    .day-card.open .day-body { display: block; }
+
+    /* Hotel strip */
+    .hotel-strip {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .hotel-strip-ico { font-size: 1rem; }
+    .hotel-strip-name { flex: 1; font-size: 0.78rem; font-weight: 500; }
+    .hotel-strip-link {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--red);
+      letter-spacing: 0.05em;
+    }
+
+    /* ════════════════════════════════════════
+       TIMELINE STOPS
+    ════════════════════════════════════════ */
+    .timeline { padding-top: 18px; }
+
+    .time-divider {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 16px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .time-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .stop {
+      display: flex;
+      gap: 13px;
+      margin-bottom: 22px;
+      position: relative;
+    }
+    .stop:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: 36px;
+      bottom: -10px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--border), transparent);
+    }
+
+    .stop-time-col {
+      width: 46px;
+      flex-shrink: 0;
+      text-align: right;
+      padding-top: 9px;
+    }
+    .stop-time {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--muted);
+      line-height: 1.3;
+    }
+
+    .stop-icon-col {
+      width: 35px;
+      flex-shrink: 0;
+    }
+    .stop-icon {
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      background: var(--bg);
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.88rem;
+    }
+    .stop-icon.food {
+      background: var(--red-soft);
+      border-color: rgba(200,75,49,0.2);
+    }
+
+    .stop-content { flex: 1; min-width: 0; }
+
+    .stop-head {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 3px;
+      flex-wrap: wrap;
+    }
+    .stop-title {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      line-height: 1.3;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    /* Status badges */
+    .badge {
+      font-size: 0.56rem;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+      padding: 3px 7px;
+      border-radius: 8px;
+      white-space: nowrap;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+    .badge.confirmed  { background: var(--s-confirmed-bg);  color: var(--s-confirmed); }
+    .badge.requested  { background: var(--s-requested-bg);  color: var(--s-requested); }
+    .badge.walkin     { background: var(--s-walkin-bg);     color: var(--s-walkin); }
+    .badge.selfbooked { background: var(--s-selfbook-bg);   color: var(--s-selfbook); }
+    .badge.suggestion { background: var(--s-suggest-bg);    color: var(--s-suggest); }
+
+    .stop-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-bottom: 7px;
+      margin-top: 4px;
+    }
+    .meta-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2px 8px;
+      font-size: 0.6rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .stop-notes {
+      font-size: 0.73rem;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+
+    /* Action buttons */
+    .stop-actions { display: flex; flex-wrap: wrap; gap: 6px; }
+    .act-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 7px 13px;
+      border-radius: 20px;
+      font-size: 0.67rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      text-decoration: none;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.14s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .act-btn:active { transform: scale(0.96); }
+    .act-btn.primary {
+      background: var(--red);
+      border-color: var(--red);
+      color: #fff;
+    }
+    .act-btn.primary:active { background: #a33d27; border-color: #a33d27; }
+
+    /* ════════════════════════════════════════
+       WEATHER TAB
+    ════════════════════════════════════════ */
+    .section-head {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.35rem;
+      font-weight: 500;
+      color: var(--text);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-head::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .weather-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      margin-bottom: 26px;
+    }
+    .weather-tile {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 10px;
+      text-align: center;
+      transition: box-shadow 0.2s;
+    }
+    .weather-tile.today-tile {
+      border-color: var(--red);
+      background: var(--red-soft);
+    }
+    .w-date { font-size: 0.6rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    .w-icon { font-size: 1.8rem; margin-bottom: 5px; }
+    .w-desc { font-size: 0.62rem; color: var(--muted); margin-bottom: 6px; }
+    .w-temps { font-size: 0.82rem; font-weight: 600; color: var(--text); }
+    .w-rain  { font-size: 0.6rem; color: #3b82f6; margin-top: 4px; }
+
+    .weather-note {
+      font-size: 0.7rem;
+      color: var(--muted);
+      text-align: center;
+      padding: 10px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 20px;
+    }
+    .weather-placeholder {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 30px 24px;
+      text-align: center;
+    }
+    .weather-placeholder p { font-size: 0.78rem; color: var(--muted); line-height: 1.6; }
+
+    /* ════════════════════════════════════════
+       CURRENCY TAB
+    ════════════════════════════════════════ */
+    .util-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .util-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.15rem;
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+    .conv-row {
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    .conv-field { flex: 1; }
+    .conv-label {
+      font-size: 0.58rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .conv-input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 1rem;
+      font-family: 'Jost', sans-serif;
+      color: var(--text);
+      background: #fff;
+      outline: none;
+      transition: border-color 0.18s;
+      -webkit-appearance: none;
+    }
+    .conv-input:focus { border-color: var(--red); }
+    .conv-sep { font-size: 1.2rem; color: var(--muted); padding-bottom: 12px; flex-shrink: 0; }
+    .conv-rate {
+      font-size: 0.68rem;
+      color: var(--muted);
+      background: var(--bg);
+      border-radius: 8px;
+      padding: 8px 12px;
+      text-align: center;
+      margin-bottom: 14px;
+    }
+    .quick-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quick-chip {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 6px 14px;
+      font-size: 0.72rem;
+      font-family: 'Jost', sans-serif;
+      cursor: pointer;
+      color: var(--text);
+      font-weight: 500;
+      transition: all 0.14s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .quick-chip:active { background: var(--red-soft); border-color: var(--red); }
+
+    /* ════════════════════════════════════════
+       INFO TAB
+    ════════════════════════════════════════ */
+    .emergency-card {
+      background: #fff5f5;
+      border: 1.5px solid #fca5a5;
+      border-radius: var(--r);
+      padding: 18px 20px;
+      margin-bottom: 18px;
+    }
+    .emergency-head {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #dc2626;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .emerg-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #fecaca;
+    }
+    .emerg-row:last-child { border-bottom: none; }
+    .emerg-name { font-size: 0.78rem; font-weight: 500; }
+    .emerg-num {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #dc2626;
+      text-decoration: none;
+      letter-spacing: 0.04em;
+    }
+    .emerg-num.small { font-size: 0.78rem; letter-spacing: 0; }
+
+    .contact-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 18px 20px;
+      margin-bottom: 16px;
+    }
+    .contact-card-title {
+      font-family: 'Cormorant Garamond', serif;
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 14px;
+    }
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .contact-row:last-child { border-bottom: none; }
+    .contact-ico {
+      width: 36px; height: 36px;
+      background: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+    .contact-info { flex: 1; }
+    .contact-name { font-size: 0.78rem; font-weight: 500; }
+    .contact-det { font-size: 0.67rem; color: var(--muted); margin-top: 2px; }
+    .contact-action {
+      background: var(--red-soft);
+      color: var(--red);
+      font-size: 0.67rem;
+      font-weight: 600;
+      padding: 6px 12px;
+      border-radius: 20px;
+      text-decoration: none;
+    }
+
+    .tip-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 15px 16px;
+      margin-bottom: 10px;
+    }
+    .tip-head { display: flex; align-items: center; gap: 9px; margin-bottom: 7px; }
+    .tip-ico { font-size: 1.15rem; }
+    .tip-title { font-size: 0.82rem; font-weight: 600; }
+    .tip-body { font-size: 0.72rem; color: var(--muted); line-height: 1.62; }
+    .tip-body strong { color: var(--text); }
+
+    /* ════════════════════════════════════════
+       TOAST
+    ════════════════════════════════════════ */
+    .toast {
+      position: fixed;
+      bottom: 30px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1a1a;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 24px;
+      font-size: 0.77rem;
+      font-weight: 500;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 1000;
+      transition: all 0.28s cubic-bezier(0.34,1.56,0.64,1);
+      white-space: nowrap;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ════════════════════════════════════════
+       SPINNER
+    ════════════════════════════════════════ */
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid var(--border);
+      border-top-color: var(--red);
+      border-radius: 50%;
+      animation: spin 0.75s linear infinite;
+    }
+    .loading-block {
+      text-align: center;
+      padding: 36px 20px;
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+    .loading-block .spinner { margin-bottom: 12px; }
+
+    /* ════════════════════════════════════════
+       RESPONSIVE
+    ════════════════════════════════════════ */
+    @media (max-width: 360px) {
+      .hero-stats { grid-template-columns: repeat(2, 1fr); }
+      .stop-time-col { width: 38px; }
+    }
+    @media (min-width: 560px) {
+      .tab-panel { padding: 24px 20px 50px; }
+      .day-header { padding: 22px 24px 16px; }
+      .day-body { padding: 0 24px 26px; }
+    }
+  </style>
+
+</head>
+<body>
+
+<!-- ═══════════════ HEADER ═══════════════ -->
+
+<header class="site-header">
+  <div class="header-main">
+    <div class="header-brand">
+      <div class="header-title">Japan 2026 · Grover Family</div>
+      <div class="header-sub">Happy Camper · Private Travel</div>
+    </div>
+    <div class="header-clock">
+      <div class="clock-time" id="jst-clock">--:--</div>
+      <div class="clock-label">Tokyo JST</div>
+    </div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+  <div class="status-ribbon" id="status-ribbon">
+    <span id="status-left">Loading…</span>
+    <span id="status-right"></span>
+  </div>
+</header>
+
+<!-- ═══════════════ TABS ═══════════════ -->
+
+<nav class="nav-tabs" role="tablist" aria-label="App sections">
+  <button class="nav-tab active" id="tab-itinerary" onclick="switchTab('itinerary')" aria-selected="true">
+    <span class="tab-icon">📅</span>Days
+  </button>
+  <button class="nav-tab" id="tab-weather" onclick="switchTab('weather')" aria-selected="false">
+    <span class="tab-icon">🌤</span>Weather
+  </button>
+  <button class="nav-tab" id="tab-currency" onclick="switchTab('currency')" aria-selected="false">
+    <span class="tab-icon">¥</span>Currency
+  </button>
+  <button class="nav-tab" id="tab-info" onclick="switchTab('info')" aria-selected="false">
+    <span class="tab-icon">ℹ️</span>Info
+  </button>
+</nav>
+
+<!-- ═══════════════ TOAST ═══════════════ -->
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<!-- ═══════════════ ITINERARY PANEL ═══════════════ -->
+
+<div class="tab-panel active" id="panel-itinerary" role="tabpanel">
+
+  <!-- Hero -->
+
+  <div class="hero-card">
+    <div class="hero-sakura">🌸</div>
+    <div class="hero-eyebrow">Private Travel · April 2026</div>
+    <div class="hero-title">Grover<br>Family</div>
+    <div class="hero-cities">Tokyo · Kyoto</div>
+    <div class="hero-stats">
+      <div class="stat-box"><div class="stat-val">9</div><div class="stat-lbl">Days</div></div>
+      <div class="stat-box"><div class="stat-val">14</div><div class="stat-lbl">Dinners</div></div>
+      <div class="stat-box"><div class="stat-val">2</div><div class="stat-lbl">Hotels</div></div>
+      <div class="stat-box"><div class="stat-val">3</div><div class="stat-lbl">Guests</div></div>
+    </div>
+    <div class="traveler-row">
+      <span class="traveler-chip">Vishal Grover</span>
+      <span class="traveler-chip">Pangea Grover</span>
+      <span class="traveler-chip">Yash · 14</span>
+    </div>
+    <div class="hotels-row">
+      <div class="hotel-pill">
+        <div class="hotel-pill-name">🏨 Janu Tokyo</div>
+        <div class="hotel-pill-dates">4–9 Apr · 5 nights</div>
+      </div>
+      <div class="hotel-pill">
+        <div class="hotel-pill-name">🏨 Hilton Kyoto</div>
+        <div class="hotel-pill-dates">9–12 Apr · 3 nights</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Legend -->
+
+  <div class="legend-card">
+    <div class="legend-title">Booking Status</div>
+    <div class="legend-chips">
+      <span class="badge confirmed">Confirmed</span>
+      <span class="badge requested">Requested</span>
+      <span class="badge walkin">Walk-in</span>
+      <span class="badge selfbooked">Self-booked</span>
+      <span class="badge suggestion">Suggestion</span>
+    </div>
+  </div>
+
+  <!-- Day cards injected here -->
+
+  <div id="days-container"></div>
+</div>
+
+<!-- ═══════════════ WEATHER PANEL ═══════════════ -->
+
+<div class="tab-panel" id="panel-weather" role="tabpanel">
+  <div id="weather-content">
+    <div class="loading-block">
+      <div class="spinner"></div>
+      <div>Fetching Tokyo &amp; Kyoto forecast…</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ CURRENCY PANEL ═══════════════ -->
+
+<div class="tab-panel" id="panel-currency" role="tabpanel">
+  <div class="section-head">¥ Currency</div>
+
+  <div class="util-card">
+    <div class="util-card-title">JPY ↔ USD Converter</div>
+    <div class="conv-row">
+      <div class="conv-field">
+        <div class="conv-label">Japanese Yen ¥</div>
+        <input type="number" class="conv-input" id="jpy-in" placeholder="10000" oninput="convertFrom('jpy')" inputmode="numeric">
+      </div>
+      <div class="conv-sep">⇌</div>
+      <div class="conv-field">
+        <div class="conv-label">US Dollars $</div>
+        <input type="number" class="conv-input" id="usd-in" placeholder="62.50" oninput="convertFrom('usd')" inputmode="decimal">
+      </div>
+    </div>
+    <div class="conv-rate">¥160 = $1.00 USD · Rate from trip planning sheet (Apr 2026)</div>
+    <div class="quick-row">
+      <button class="quick-chip" onclick="setJpy(1000)">¥1,000</button>
+      <button class="quick-chip" onclick="setJpy(5000)">¥5,000</button>
+      <button class="quick-chip" onclick="setJpy(10000)">¥10,000</button>
+      <button class="quick-chip" onclick="setJpy(20000)">¥20,000</button>
+      <button class="quick-chip" onclick="setJpy(50000)">¥50,000</button>
+      <button class="quick-chip" onclick="setJpy(100000)">¥100,000</button>
+    </div>
+  </div>
+
+  <div class="util-card">
+    <div class="util-card-title">Quick Reference</div>
+    <div style="font-size:0.73rem;color:var(--muted);line-height:2;">
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:6px 0;">
+        <span>Convenience store meal</span><span style="font-weight:600;color:var(--text)">¥500–800 · ~$3–5</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:6px 0;">
+        <span>Ramen (walk-in)</span><span style="font-weight:600;color:var(--text)">¥1,000–1,500 · ~$7–10</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:6px 0;">
+        <span>Taxi (short ride)</span><span style="font-weight:600;color:var(--text)">¥800–2,000 · ~$5–13</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid var(--border);padding:6px 0;">
+        <span>Premium omakase pp</span><span style="font-weight:600;color:var(--text)">¥30,000–50,000+</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;padding:6px 0;">
+        <span>Shinkansen Tokyo→Kyoto</span><span style="font-weight:600;color:var(--text)">¥13,850 (~$87)</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="util-card">
+    <div class="util-card-title" style="margin-bottom:10px;">ATM Tips</div>
+    <div class="tip-body" style="font-size:0.73rem;color:var(--muted);line-height:1.7;">
+      Use <strong style="color:var(--text)">7-Eleven</strong> or <strong style="color:var(--text)">Japan Post</strong> ATMs — they reliably accept foreign cards 24/7. Most other ATMs will decline international cards. Carry ¥30,000–50,000 per person at all times. Several restaurants on this trip are <strong style="color:var(--text)">cash only</strong>.
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ INFO PANEL ═══════════════ -->
+
+<div class="tab-panel" id="panel-info" role="tabpanel">
+
+  <div class="emergency-card">
+    <div class="emergency-head">🚨 Emergency — Japan</div>
+    <div class="emerg-row">
+      <span class="emerg-name">Police</span>
+      <a href="tel:110" class="emerg-num">110</a>
+    </div>
+    <div class="emerg-row">
+      <span class="emerg-name">Ambulance &amp; Fire</span>
+      <a href="tel:119" class="emerg-num">119</a>
+    </div>
+    <div class="emerg-row">
+      <span class="emerg-name">Happy Camper Assist</span>
+      <a href="tel:+819061589006" class="emerg-num small">+81 90 6158 9006</a>
+    </div>
+  </div>
+
+  <div class="contact-card">
+    <div class="contact-card-title">Key Contacts</div>
+    <div class="contact-row">
+      <div class="contact-ico">🏕️</div>
+      <div class="contact-info">
+        <div class="contact-name">Happy Camper</div>
+        <div class="contact-det">hello@happycamper.food</div>
+      </div>
+      <a href="mailto:hello@happycamper.food" class="contact-action">Email</a>
+    </div>
+    <div class="contact-row">
+      <div class="contact-ico">📞</div>
+      <div class="contact-info">
+        <div class="contact-name">Happy Camper Line</div>
+        <div class="contact-det">+81 90 6158 9006</div>
+      </div>
+      <a href="tel:+819061589006" class="contact-action">Call</a>
+    </div>
+    <div class="contact-row">
+      <div class="contact-ico">🏨</div>
+      <div class="contact-info">
+        <div class="contact-name">Janu Tokyo</div>
+        <div class="contact-det">Apr 4–9 · Minato, Tokyo</div>
+      </div>
+      <a href="https://maps.google.com/maps?q=Janu+Tokyo" target="_blank" class="contact-action">Map</a>
+    </div>
+    <div class="contact-row">
+      <div class="contact-ico">🏨</div>
+      <div class="contact-info">
+        <div class="contact-name">Hilton Kyoto</div>
+        <div class="contact-det">Apr 9–12 · Kyoto</div>
+      </div>
+      <a href="https://maps.google.com/maps?q=Hilton+Kyoto" target="_blank" class="contact-action">Map</a>
+    </div>
+  </div>
+
+  <div class="section-head">Dining Etiquette</div>
+  <div class="tip-card">
+    <div class="tip-head"><span class="tip-ico">🚫</span><span class="tip-title">No Fragrance — Critical</span></div>
+    <div class="tip-body">Avoid all perfume, cologne, scented hair products, and strongly fragranced laundry detergent on dining days. Even light scents disrupt the aromas at omakase counters and can offend the chef. This is the single most important etiquette rule in Japan's top restaurants.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-head"><span class="tip-ico">⏰</span><span class="tip-title">Punctuality is Non-Negotiable</span></div>
+    <div class="tip-body">At omakase counters, the meal begins simultaneously for all guests. Arriving late disrupts the chef's carefully timed service and inconveniences every other diner. Allow extra travel time — many restaurants are on unmarked side streets. Budget an extra 15 minutes.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-head"><span class="tip-ico">💍</span><span class="tip-title">Counter Etiquette</span></div>
+    <div class="tip-body">Remove rings, watches, and bracelets before sitting at sushi counters — the wood (often rare hinoki cypress) scratches easily. Rest both hands on the counter, not in your lap. Do not rearrange sushi — eat each piece as the chef presents it.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-head"><span class="tip-ico">🙏</span><span class="tip-title">After the Meal</span></div>
+    <div class="tip-body">Say <strong>「ごちそうさまでした」</strong> <em>(Gochisousama deshita)</em> — "Thank you for this meal." It is deeply appreciated. Tipping is not customary and can be mildly offensive. Express appreciation with sincere words, not cash.</div>
+  </div>
+
+  <div class="section-head" style="margin-top:20px;">Practical</div>
+  <div class="tip-card">
+    <div class="tip-head"><span class="tip-ico">📱</span><span class="tip-title">Suica Transit Card</span></div>
+    <div class="tip-body">Add a Suica card to your Apple or Google Wallet before departure. Covers all subway, bus, and train fares in Tokyo and Kyoto. Tap your phone at the gate. Top up via your linked card when low. Far easier than buying individual tickets.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-head"><span class="tip-ico">📶</span><span class="tip-title">eSIM &amp; Connectivity</span></div>
+    <div class="tip-body">Activate an eSIM before landing. Recommended: <strong>Airalo</strong>, <strong>HolaFly</strong>, or <strong>YO</strong> for Japan coverage. Japan's 4G/5G network is exceptionally reliable. Google Maps works accurately throughout Tokyo and Kyoto.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-head"><span class="tip-ico">🌸</span><span class="tip-title">Cherry Blossoms</span></div>
+    <div class="tip-body">Peak sakura in Tokyo and Kyoto falls late March to early April — this trip is perfectly timed. Conditions change daily. Your guide will check blossom status each morning and adjust sightseeing recommendations accordingly. Best viewing: Shinjuku Gyoen, Chidori-ga-fuchi, Maruyama Park.</div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-head"><span class="tip-ico">🔌</span><span class="tip-title">Power &amp; Adapters</span></div>
+    <div class="tip-body">Japan: 100V, two-pronged flat sockets. North American devices work without a converter. European and Australian visitors need a voltage converter. UK visitors need an adapter — Japan uses US-style flat pins, not UK three-pin.</div>
+  </div>
+
+</div><!-- /info panel -->
+
+<!-- ═══════════════════════════════════════════
+     JAVASCRIPT
+═══════════════════════════════════════════ -->
+
+<script>
+'use strict';
+
+// ════════════════════════════════════════════
+// TRIP DATA — Edit this to update the itinerary
+// ════════════════════════════════════════════
+const TRIP = {
+  title:      'Japan 2026',
+  family:     'Grover Family',
+  startDate:  '2026-04-04',
+  endDate:    '2026-04-12',
+  jpyPerUsd:  160,  // Exchange rate from planning sheet
+
+  days: [
+    // ─── DAY 1 · SAT 4 APR ───────────────
+    {
+      date: '2026-04-04', num: 1, city: 'Tokyo', hotel: 'Janu Tokyo',
+      label: 'Arrival — Pizza 38 Shinohara',
+      stops: [
+        {
+          time: 'Evening', icon: '✈️', type: 'transport', status: 'confirmed',
+          title: 'Arrival — Transfer to Janu Tokyo',
+          loc: 'Janu Tokyo Minato Tokyo',
+          notes: 'Check in and settle. Janu Tokyo is one of the city\'s newest ultra-luxury properties in the vibrant Minato district — world-class spa, sky-high pool, and views over the Tokyo skyline. A spectacular base for the week. Drivers arranged by Happy Camper will meet at the airport with a sign.'
+        },
+        {
+          time: '20:00', icon: '🍕', type: 'dinner', status: 'confirmed',
+          title: 'Pizza 38 Shinohara',
+          cuisine: 'Neapolitan Pizza', diners: '3 pax',
+          loc: 'Pizza 38 Shinohara Tokyo',
+          notes: 'Welcome dinner in Tokyo — and an immediate statement of intent. Chef Shinohara trained in Naples and has brought a deeply serious Neapolitan practice to Tokyo: 72-hour fermented dough, imported Caputo flour, and a wood-fired oven running at 485°C. The result is textbook-perfect crust — blistered, chewy, charred at the cornicione, light at the centre. One of the city\'s most celebrated pizza counters, and a perfect opener to a trip that will include three distinct pizza experiences across Tokyo and Kyoto.'
+        }
+      ]
+    },
+
+    // ─── DAY 2 · SUN 5 APR ───────────────
+    {
+      date: '2026-04-05', num: 2, city: 'Tokyo', hotel: 'Janu Tokyo',
+      label: 'Tokyo — Ramen · Yakitori Shinohara',
+      stops: [
+        {
+          time: 'Morning', icon: '🌸', type: 'activity', status: 'suggestion',
+          title: 'Cherry Blossom Walk',
+          loc: 'Shinjuku Gyoen National Garden Tokyo',
+          notes: 'A free morning to explore. Shinjuku Gyoen is Tokyo\'s finest sakura park — over 1,000 cherry trees including weeping yoshino, double-flowered, and rare pink varieties across 58 hectares. Alternatively: the Meguro River canal walk in Nakameguro, where thousands of pink blossoms arch over the water and cafés spill onto the bankside. Your guide will advise on peak conditions each morning.'
+        },
+        {
+          time: 'Lunch', icon: '🍜', type: 'lunch', status: 'walkin',
+          title: 'Ramen',
+          cuisine: 'Ramen · Walk-in only',
+          loc: 'best ramen Tokyo walk-in',
+          notes: 'No reservation required — and none possible. Tokyo\'s ramen culture is proudly democratic. Outstanding walk-in options: Fuunji (Shinjuku) for legendary tsukemen dipping noodles; Afuri (multiple locations) for yuzu-bright shoyu broth; or a tonkotsu counter in Shibuya. Follow a queue and you will rarely go wrong. The discipline of a single bowl perfected over decades is on full display.'
+        },
+        {
+          time: '20:30', icon: '🍢', type: 'dinner', status: 'confirmed',
+          title: 'Yakitori Shinohara',
+          cuisine: 'Premium Yakitori · Binchotan grill', diners: '3 pax',
+          loc: 'Yakitori Shinohara Tokyo',
+          notes: 'One of Tokyo\'s finest yakitori counters, where every part of the chicken is approached with the same reverence a sushi chef gives to tuna. Skewers are cooked over binchōtan white charcoal — made from ancient holm oak, it burns at a higher temperature and emits almost no smoke, imparting a clean, subtle char without bitterness. The cut determines the distance from the coals: fatty kawa (skin) crisps at distance, lean mune (breast) stays close. Must-orders: tsukune (hand-formed meatball with raw egg yolk), and the prized oyster cut. Deeply satisfying, deeply Japanese.'
+        }
+      ]
+    },
+
+    // ─── DAY 3 · MON 6 APR ───────────────
+    {
+      date: '2026-04-06', num: 3, city: 'Tokyo', hotel: 'Janu Tokyo',
+      label: 'Fish Market · teamLab Planets · Chidori-ga-fuchi · Yoroniku',
+      stops: [
+        {
+          time: '07:15', icon: '🐟', type: 'activity', status: 'confirmed',
+          title: 'Toyosu Fish Market — with Tomoko',
+          loc: 'Toyosu Fish Market Tokyo',
+          notes: 'An early departure for the world\'s largest seafood market — the engine room behind Tokyo\'s extraordinary culinary culture. Guided by Tomoko, the family will visit the legendary tuna intermediate wholesalers, experience the scale and kinetic energy of the pre-dawn trading floor, and browse the professional tools floor where Japan\'s finest chefs buy their knives and kitchen equipment. The market is most alive between 06:00–08:30. Wear closed, comfortable shoes and follow Tomoko\'s guidance at all times. A working market — not a tourist attraction.'
+        },
+        {
+          time: '10:30', icon: '🎨', type: 'activity', status: 'confirmed',
+          title: 'teamLab Planets — Toyosu',
+          loc: 'teamLab Planets Toyosu Tokyo',
+          notes: 'Directly after the market, a complete change of register. teamLab Planets is one of the world\'s most celebrated immersive digital art environments — visitors remove shoes and walk barefoot through rooms of knee-deep reflective water, infinite mirrored light fields, and vast fields of seasonal flowers rendered in light. The contrast with the pre-dawn market — noise and fish and fluorescent halls replaced by silence, water, and colour — makes this one of the journey\'s most varied and memorable days. Buy tickets in advance; they sell out weeks ahead in sakura season.'
+        },
+        {
+          time: '12:30', icon: '🥩', type: 'lunch', status: 'confirmed',
+          title: 'Wagyu Mafia Katsusando',
+          cuisine: 'A5 Wagyu Katsu Sandwich',
+          loc: 'Wagyu Mafia Tokyo katsusando',
+          notes: 'The most famous sandwich in Japan — possibly anywhere. Hisato Hamada\'s Wagyu Mafia has built an international cult around this single creation: A5 wagyu beef tenderloin, hand-breaded in house-made panko, deep-fried to shattering, caramelised perfection, and set between precisely toasted Japanese shokupan (milk bread) with a whisper of house tonkatsu sauce. The marbling of the A5 grade means the fat melts into the hot crumb in seconds. A cultural experience as much as a culinary one. Eat it immediately — it does not travel.'
+        },
+        {
+          time: '13:00', icon: '🍕', type: 'lunch', status: 'confirmed',
+          title: 'Seirinkan',
+          cuisine: 'Legendary Wood-Fired Pizza · Tokyo',
+          loc: 'Seirinkan pizza Tokyo Nakameguro',
+          notes: 'Susumu Kakinuma — a near-mythical figure in Tokyo\'s culinary world — is one of the great pioneers who shaped Japan\'s understanding of serious pizza over four decades. His traditional wood-fired Neapolitan approach has attracted international chefs, critics, and a devoted following. Seirinkan feels like nowhere else: a lunch that exists entirely on its own terms, in a room where little has changed in years, and nothing needs to. One of Tokyo\'s genuine cult institutions. Note: two outstanding lunch options on this day — your guide will advise on timing and sequencing.'
+        },
+        {
+          time: '18:30', icon: '🛶', type: 'activity', status: 'confirmed',
+          title: 'Chidori-ga-fuchi — Rowboat under the Sakura',
+          loc: 'Chidori-ga-fuchi moat Tokyo cherry blossoms rowboat',
+          notes: 'One of Tokyo\'s most iconic spring experiences, and one that cannot be replicated outside sakura season. The ancient imperial moat beneath Chiyoda Palace is flanked by hundreds of yoshino cherry trees; rowing through the pale-pink canopy as petals drift silently onto the dark water below is quietly extraordinary. Arrive before sunset for the warmest light. Boats are rented by the hour. Walk the towpath beforehand for the full effect — the trees form a near-unbroken tunnel of blossom along the bank.'
+        },
+        {
+          time: '20:15', icon: '🥩', type: 'dinner', status: 'confirmed',
+          title: 'Yoroniku — Azabudai Hills',
+          cuisine: 'A5 Wagyu Yakiniku Omakase · Azabudai Hills',
+          loc: 'Yoroniku Azabudai Hills Tokyo',
+          notes: 'One of the most coveted dinner reservations in all of Tokyo — a table held months ahead by those who know. Yoroniku\'s new Azabudai Hills location brings the same legendary omakase procession to one of the city\'s most spectacular new developments. The menu moves through a curated sequence of A5 wagyu cuts grilled tableside over premium binchōtan: from leaner cuts requiring high, direct heat, through the extraordinary fatty portions that need only the whisper of coals below. The beef sourcing, the room, the service — all exceptional. A defining dinner of the Tokyo chapter.'
+        }
+      ]
+    },
+
+    // ─── DAY 4 · TUE 7 APR ───────────────
+    {
+      date: '2026-04-07', num: 4, city: 'Tokyo', hotel: 'Janu Tokyo',
+      label: 'Sushi Mikasa · teamLab Borderless · Saito',
+      stops: [
+        {
+          time: 'Morning', icon: '🌸', type: 'activity', status: 'suggestion',
+          title: 'Free Morning — Tokyo',
+          loc: 'Hamarikyu Gardens Tokyo',
+          notes: 'A free morning. Options worth considering: Hamarikyu Gardens (tidal garden at the edge of Tokyo Bay — extraordinary in sakura season, traditional teahouse within), Tsukiji Outer Market for breakfast (oysters, tamagoyaki, street sashimi), or rest and the Janu spa before the evening\'s extraordinary sushi dinner. TM hosts tonight — an honour in Tokyo\'s finest culinary circles.'
+        },
+        {
+          time: '13:00', icon: '🍣', type: 'lunch', status: 'confirmed',
+          title: 'Mikasa Kaikan Yamato',
+          cuisine: 'Omakase Sushi · Tokyo',
+          loc: 'Mikasa Kaikan Yamato sushi Tokyo',
+          notes: 'A celebrated Tokyo sushi counter that draws on the same Toyosu supply chain as Japan\'s most celebrated restaurants. The nigiri here reflects a classical Edomae approach: aged fish, hand-pressed rice seasoned with red vinegar, each piece served at room temperature and eaten immediately by hand or chopstick. The fish sourcing is exceptional, the progression carefully considered. A fitting daytime counterpart to the evening\'s omakase.'
+        },
+        {
+          time: '14:30', icon: '🎨', type: 'activity', status: 'confirmed',
+          title: 'teamLab Borderless — Azabudai Hills',
+          loc: 'teamLab Borderless Azabudai Hills Tokyo',
+          notes: 'The legendary "museum without a map" in its spectacular new Azabudai Hills home. A vast interconnected world of digital art where works migrate freely between rooms with no fixed route — you wander and the art finds you. Completely distinct from Planets: darker, denser, more labyrinthine. The athletic body installation, the forest of resonating lamps, and the En Tea House are not to be missed. Book tickets well in advance.'
+        },
+        {
+          time: '20:30', icon: '🍣', type: 'dinner', status: 'selfbooked',
+          title: 'Saito',
+          cuisine: 'Omakase Sushi · Hosted by TM',
+          loc: 'Saito sushi Tokyo',
+          notes: 'This evening is hosted by TM — a mark of exceptional generosity in Tokyo\'s fine dining world. Saito is one of the capital\'s most celebrated omakase sushi counters, operating at a level reserved for guests introduced by trusted relationships. The chef\'s progression through the seasons of Toyosu — from white fish in vinegar, through tuna, to the rich uni and ikura of the close — is a masterclass in restraint and precision. No fragrance. Arrive 5 minutes early. Follow the chef\'s pace entirely.'
+        }
+      ]
+    },
+
+    // ─── DAY 5 · WED 8 APR ───────────────
+    {
+      date: '2026-04-08', num: 5, city: 'Tokyo', hotel: 'Janu Tokyo',
+      label: '400°C Pizza · teamLab Borderless · Sugalabo',
+      stops: [
+        {
+          time: '12:30', icon: '🍕', type: 'lunch', status: 'confirmed',
+          title: '400°C Pizza',
+          cuisine: 'Neapolitan Pizza · Tokyo',
+          loc: '400 Degrees pizza Tokyo',
+          notes: 'The name is the operating temperature of the wood-fired oven — the defining condition for authentic Neapolitan crust. At 400°C a pizza cooks in 60–90 seconds: the cornicione blisters instantly and chars at the edge, the centre stays soft and yielding, the underside develops the leopard-spot pattern of a properly managed stone. This is the third pizza experience of the trip and a fascinating triangle of comparison: Shinohara\'s refinement, Seirinkan\'s cult simplicity, and 400°C\'s intensity. Each approach reveals something different about what the tradition demands.'
+        },
+        {
+          time: '20:30', icon: '⭐', type: 'dinner', status: 'confirmed',
+          title: 'Sugalabo',
+          cuisine: 'French-Japanese Private Club · 4 pax',
+          loc: 'Sugalabo Tokyo members club',
+          notes: 'Chef Yosuke Suga — former executive chef of Joël Robuchon Tokyo — operates one of the most exclusive dining experiences in Asia from an unmarked private space accessible strictly by introduction. The French-Japanese menu changes daily based on what the chef sourced that morning: a living document of the market\'s finest, rendered through classical French technique and Japanese ingredient philosophy. The produce is extraordinary, the technique flawless, and the atmosphere that of dining in a private home. Widely considered one of the three or four greatest tables in Japan. 4 guests this evening. No fragrance without exception. Arrive early.'
+        }
+      ]
+    },
+
+    // ─── DAY 6 · THU 9 APR ───────────────
+    {
+      date: '2026-04-09', num: 6, city: 'Kyoto', hotel: 'Hilton Kyoto',
+      label: 'Sumo Training · Shinkansen to Kyoto · Enboca',
+      stops: [
+        {
+          time: '08:30', icon: '🏋️', type: 'activity', status: 'requested',
+          title: 'Sumo Stable — Morning Keiko',
+          loc: 'sumo stable morning practice Tokyo',
+          notes: 'One of the rarest experiences available to outside visitors in Japan. The family will observe the morning keiko (practice session) at close range: wrestlers training under their coach\'s eye, the raw physicality and extraordinary discipline of the sport on full display, the hierarchy of sumo culture visible in every interaction. Duration approximately 1h 45 min. Strict protocols apply: no food, drink, photography, or audio during training. Observe in complete silence. Subject to final confirmation one week prior.'
+        },
+        {
+          time: '13:00', icon: '🚄', type: 'transport', status: 'selfbooked',
+          title: 'Shinkansen — Tokyo to Kyoto',
+          loc: 'Tokyo Station Shinkansen Nozomi Green Car',
+          notes: 'Nozomi bullet train from Tokyo Station, arriving Kyoto approximately 2 hours 15 minutes later. Green Car (first class) seating — wider seats, more legroom, quieter carriage. Buy an ekiben (premium station bento box) from Tokyo Station for the journey — a quintessentially Japanese rail experience. Sit on the right-hand side of the train (seats C/D) heading south: on a clear day Mount Fuji appears briefly and dramatically between Shin-Fuji and Shizuoka stations. Transfer to Hilton Kyoto on arrival.'
+        },
+        {
+          time: '20:30', icon: '🍕', type: 'dinner', status: 'confirmed',
+          title: 'Enboca',
+          cuisine: 'Neapolitan Pizza · Kyoto',
+          loc: 'Enboca pizza Kyoto',
+          notes: 'A beloved Kyoto pizzeria and the perfect first dinner after the transit from Tokyo. Enboca has built a devoted following around beautifully fermented dough, premium imported San Marzano tomatoes, and fiordilatte mozzarella. The room is casual, warm, and instantly comfortable — the ideal decompression after the sumo stable, the Shinkansen, and check-in. This is the fourth pizza experience of the trip, and Enboca\'s Kyoto character makes it quietly the most surprising of the four.'
+        }
+      ]
+    },
+
+    // ─── DAY 7 · FRI 10 APR ───────────────
+    {
+      date: '2026-04-10', num: 7, city: 'Kyoto', hotel: 'Hilton Kyoto',
+      label: 'teamLab Kyoto · Wagyumafia Sandwich · SonomA',
+      stops: [
+        {
+          time: 'Morning', icon: '⛩️', type: 'activity', status: 'suggestion',
+          title: 'Kyoto Morning — Fushimi Inari or Philosopher\'s Walk',
+          loc: 'Fushimi Inari Taisha Kyoto',
+          notes: 'Two outstanding options: Fushimi Inari — ten thousand vermillion torii gates climbing the mountain behind the shrine, each donated by a Japanese business in prayer for prosperity. Arrive before 08:00 to experience the upper gates in near-silence. Or the Philosopher\'s Walk: a 2km stone canal path lined with hundreds of cherry trees in April bloom, connecting Ginkaku-ji (Silver Pavilion) to Nanzen-ji. Both are quintessentially Kyoto — completely unlike anything in Tokyo.'
+        },
+        {
+          time: '12:00', icon: '🎨', type: 'activity', status: 'confirmed',
+          title: 'teamLab Kyoto',
+          loc: 'teamLab Kyoto Nijo-jo sake brewery',
+          notes: 'The Kyoto installation of teamLab is set within a 200-year-old sake brewery building near Nijo Castle — a remarkable pairing of ancient craft architecture and contemporary digital nature. The art inhabits the historic space rather than overriding it: forests of crystalline light, seasonal flowers blooming and dying in response to the presence of visitors, water rippling from each footstep. Completely distinct from Planets and Borderless — quieter, more contemplative. Book tickets in advance.'
+        },
+        {
+          time: '~13:00', icon: '🍗', type: 'lunch', status: 'suggestion',
+          title: 'Karaage Lunch',
+          cuisine: 'Karaage · Kyoto neighbourhood restaurant',
+          loc: 'best karaage Kyoto lunch',
+          notes: 'Kyoto\'s neighbourhood restaurants execute karaage — Japanese fried chicken marinated in soy, sake, ginger, and garlic — with extraordinary lightness and depth. Double-fried for a shatteringly crisp exterior and a juicy, fragrant interior. A joyful, restorative midday meal. Your guide will select the best option based on the morning\'s location.'
+        },
+        {
+          time: '18:45', icon: '🥩', type: 'activity', status: 'confirmed',
+          title: 'Wagyumafia — The Cutlet Sandwich · Kyoto',
+          loc: 'Wagyumafia Kyoto The Cutlet Sandwich',
+          notes: 'The Kyoto outpost of Japan\'s most famous sandwich — a pre-dinner experience in its own right. The wagyu katsu sandwich that built an international cult: A5 wagyu tenderloin, hand-breaded in house panko, fried to shattering perfection, and placed between toasted shokupan milk bread with house tonkatsu sauce. At Kyoto, the setting is refined further. Eat immediately at the counter — the crunch lives only in the first 60 seconds.'
+        },
+        {
+          time: '~20:00', icon: '🍽️', type: 'dinner', status: 'requested',
+          title: 'SonomA',
+          cuisine: 'California-Japanese · Kyoto',
+          loc: 'SonomA restaurant Kyoto',
+          notes: 'One of Kyoto\'s most interesting contemporary tables — a restaurant drawing equally from California\'s open-fire culinary tradition and Kyoto\'s extraordinary seasonal ingredient culture. The kitchen works with premium Japanese proteins and local Kyoto vegetables over wood and charcoal, with a creative sensibility that feels resolutely modern. Relaxed atmosphere, consistently excellent food, and a wine programme with genuine character. A fitting close to a full Kyoto day.'
+        }
+      ]
+    },
+
+    // ─── DAY 8 · SAT 11 APR ───────────────
+    {
+      date: '2026-04-11', num: 8, city: 'Kyoto', hotel: 'Hilton Kyoto',
+      label: 'Arashiyama · Soba · Oka Aged Wagyu',
+      stops: [
+        {
+          time: 'Morning', icon: '🎋', type: 'activity', status: 'suggestion',
+          title: 'Arashiyama Bamboo Grove & Gion',
+          loc: 'Arashiyama Bamboo Grove Kyoto',
+          notes: 'Arashiyama\'s bamboo grove in the early morning — the columns of ancient bamboo are most extraordinary before 08:00, when the light filters through the canopy and the space is quiet. Follow with Tenryu-ji\'s garden (one of Japan\'s finest karesansui), then cross Togetsukyo Bridge and return to Kyoto for Gion. Hanamikoji Street in the late afternoon is Kyoto\'s most atmospheric lane — preserved machiya townhouses, stone-flagged pathways, and the occasional glimpse of a maiko in full dress heading to an engagement.'
+        },
+        {
+          time: '~12:30', icon: '🍜', type: 'lunch', status: 'suggestion',
+          title: 'Soba Lunch',
+          cuisine: 'Handmade Soba · Kyoto',
+          loc: 'best handmade soba Kyoto lunch',
+          notes: 'A quiet, beautiful prelude to the evening\'s extraordinary wagyu dinner. Kyoto\'s finest soba counters hand-mill their own buckwheat — the stone-ground flour gives a nuttiness and fragrance that machine-milled cannot replicate. Served cold on a bamboo tray (zaru soba) with cold dashi tsuyu on the side, or in a delicate hot broth. A masterclass in simplicity. Your guide will select the best option for today\'s rhythm.'
+        },
+        {
+          time: '19:30', icon: '🥩', type: 'dinner', status: 'confirmed',
+          title: 'Oka — Dry-Aged Wagyu',
+          cuisine: 'Aged Wagyu Kaiseki · Kyoto', diners: '3 pax',
+          loc: 'Oka restaurant aged wagyu Kyoto',
+          notes: 'The rarest wagyu experience in Japan, and one of the most remarkable meals of the entire journey. Chef Oka dry-ages A5 wagyu beef for weeks — a technique almost unheard of at this quality level, since most premium wagyu in Japan is served fresh within days of slaughter. The ageing concentrates the mineral richness of the fat, deepens the umami of the muscle, and transforms the texture into something simultaneously more intense and more supple than fresh wagyu. Experienced wagyu diners consistently describe Oka as a revelation. Book immediately upon confirming the trip — this is one of Kyoto\'s most limited tables. 3 guests this evening.'
+        }
+      ]
+    },
+
+    // ─── DAY 9 · SUN 12 APR ───────────────
+    {
+      date: '2026-04-12', num: 9, city: 'Tokyo', hotel: 'Departures',
+      label: 'Departure Day',
+      stops: [
+        {
+          time: 'Early AM', icon: '✈️', type: 'transport', status: 'confirmed',
+          title: 'Departure — Return to Tokyo / Fly Home',
+          loc: 'Hilton Kyoto check out',
+          notes: 'Pack the night before. Depart Hilton Kyoto. Transfers arranged to your departure airport — confirm vehicle and timing with the hotel the evening before. Sayōnara Japan — and until next time. 🌸'
+        }
+      ]
+    }
+  ] // end days
+}; // end TRIP
+
+// ════════════════════════════════════════════
+// WEATHER CODE → EMOJI + DESCRIPTION
+// ════════════════════════════════════════════
+function decodeWeather(code) {
+  const map = {
+    0:  ['☀️','Clear'],   1:  ['🌤️','Mainly clear'], 2:  ['⛅','Partly cloudy'],
+    3:  ['☁️','Overcast'], 45: ['🌫️','Foggy'],        48: ['🌫️','Icy fog'],
+    51: ['🌦️','Drizzle'], 53: ['🌦️','Drizzle'],      55: ['🌧️','Heavy drizzle'],
+    61: ['🌧️','Light rain'],63:['🌧️','Rain'],         65: ['🌧️','Heavy rain'],
+    71: ['❄️','Light snow'],73:['❄️','Snow'],          75: ['❄️','Heavy snow'],
+    80: ['🌦️','Showers'], 81: ['🌧️','Showers'],      82: ['🌧️','Heavy showers'],
+    95: ['⛈️','Thunderstorm']
+  };
+  return map[code] || ['🌡️','Variable'];
+}
+
+// ════════════════════════════════════════════
+// UTILITIES
+// ════════════════════════════════════════════
+function fmtDate(iso) {
+  const d = new Date(iso + 'T12:00:00');
+  return d.toLocaleDateString('en-GB', { weekday:'short', day:'numeric', month:'short' });
+}
+
+function todayJST() {
+  const now = new Date();
+  const jst = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+  return jst.toISOString().slice(0, 10);
+}
+
+function mapsUrl(q)     { return 'https://maps.google.com/maps?q=' + encodeURIComponent(q); }
+function navUrl(q)      { return 'https://maps.google.com/maps?daddr=' + encodeURIComponent(q) + '&dirflg=d'; }
+
+function copyText(text, label) {
+  const fallback = () => {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+      document.body.removeChild(ta); showToast('📋 ' + label + ' copied');
+    } catch(e) { showToast('⚠️ Copy failed'); }
+  };
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => showToast('📋 ' + label + ' copied')).catch(fallback);
+  } else { fallback(); }
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 2300);
+}
+
+// Event delegation for copy buttons
+document.addEventListener('click', function(e) {
+  const btn = e.target.closest('[data-copy]');
+  if (btn) copyText(btn.dataset.copy, btn.dataset.label || 'Address');
+});
+
+// ════════════════════════════════════════════
+// CLOCK — JST
+// ════════════════════════════════════════════
+function tick() {
+  const now = new Date();
+  const jst = new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Tokyo' }));
+  const h = String(jst.getHours()).padStart(2,'0');
+  const m = String(jst.getMinutes()).padStart(2,'0');
+  document.getElementById('jst-clock').textContent = h + ':' + m;
+}
+
+// ════════════════════════════════════════════
+// STATUS RIBBON + PROGRESS BAR
+// ════════════════════════════════════════════
+function updateRibbon() {
+  const today   = todayJST();
+  const start   = new Date(TRIP.startDate + 'T00:00:00');
+  const end     = new Date(TRIP.endDate   + 'T00:00:00');
+  const todayD  = new Date(today          + 'T00:00:00');
+  const ribbon  = document.getElementById('status-ribbon');
+  const left    = document.getElementById('status-left');
+  const right   = document.getElementById('status-right');
+  const pfill   = document.getElementById('progress-fill');
+
+  const span     = (end - start) / 864e5;
+  const elapsed  = (todayD - start) / 864e5;
+  const pct      = Math.max(0, Math.min(100, (elapsed / span) * 100));
+  pfill.style.width = pct + '%';
+
+  if (todayD < start) {
+    const diff = Math.ceil((start - todayD) / 864e5);
+    ribbon.className = 'status-ribbon pre-trip';
+    left.textContent  = 'Trip begins in ' + diff + (diff === 1 ? ' day' : ' days');
+    right.textContent = '4 Apr → 12 Apr';
+  } else if (todayD > end) {
+    ribbon.className = 'status-ribbon post-trip';
+    left.textContent  = 'Trip completed — Sayōnara! 🇯🇵';
+    right.textContent = '';
+  } else {
+    const cur = TRIP.days.find(d => d.date === today);
+    if (cur) {
+      ribbon.className = 'status-ribbon city-' + cur.city.toLowerCase();
+      left.textContent  = 'Day ' + cur.num + ' · ' + cur.city;
+      right.textContent = cur.hotel;
+    }
+  }
+}
+
+// ════════════════════════════════════════════
+// BADGE LABELS
+// ════════════════════════════════════════════
+const BADGE_LABELS = {
+  confirmed:  'Confirmed',
+  requested:  'Requested',
+  walkin:     'Walk-in',
+  selfbooked: 'Self-booked',
+  suggestion: 'Suggestion'
+};
+
+// ════════════════════════════════════════════
+// RENDER DAY CARDS
+// ════════════════════════════════════════════
+function renderStop(s) {
+  const isFood = ['dinner','lunch'].includes(s.type);
+  const meta = [];
+  if (s.cuisine) meta.push(s.cuisine);
+  if (s.diners)  meta.push('👥 ' + s.diners);
+  const metaHtml = meta.length
+    ? '<div class="stop-meta">' + meta.map(m => '<span class="meta-chip">' + m + '</span>').join('') + '</div>'
+    : '';
+  const notesHtml = s.notes
+    ? '<div class="stop-notes">' + s.notes + '</div>'
+    : '';
+  const badgeHtml = s.status
+    ? '<span class="badge ' + s.status + '">' + (BADGE_LABELS[s.status] || s.status) + '</span>'
+    : '';
+  const actionsHtml = s.loc ? `
+    <div class="stop-actions">
+      <a href="${mapsUrl(s.loc)}" target="_blank" rel="noopener" class="act-btn primary">🗺 Maps</a>
+      <a href="${navUrl(s.loc)}"  target="_blank" rel="noopener" class="act-btn">🧭 Navigate</a>
+      <button class="act-btn" data-copy="${s.loc}" data-label="${s.title}">📋 Copy</button>
+    </div>` : '';
+
+  return `
+    <div class="stop">
+      <div class="stop-time-col"><div class="stop-time">${s.time || ''}</div></div>
+      <div class="stop-icon-col">
+        <div class="stop-icon ${isFood ? 'food' : ''}">${s.icon || '📍'}</div>
+      </div>
+      <div class="stop-content">
+        <div class="stop-head">
+          <div class="stop-title">${s.title}</div>
+          ${badgeHtml}
+        </div>
+        ${metaHtml}
+        ${notesHtml}
+        ${actionsHtml}
+      </div>
+    </div>`;
+}
+
+function renderDays() {
+  const today = todayJST();
+  const container = document.getElementById('days-container');
+  let html = '';
+
+  TRIP.days.forEach(day => {
+    const isToday  = day.date === today;
+    const isPast   = day.date < today;
+    const cityLow  = day.city.toLowerCase();
+    const isOpen   = isToday || (today < TRIP.startDate && day.num === 1);
+
+    const pillHtml = isToday
+      ? '<span class="pill-today">Today</span>'
+      : (isPast ? '<span class="pill-past">Done ✓</span>' : '');
+
+    const stopsHtml = day.stops.map(renderStop).join('');
+
+    html += `
+      <div class="day-card${isToday?' today':''}${isPast&&!isToday?' past':''}${isOpen?' open':''}" id="day-${day.date}">
+        <div class="day-header" onclick="toggleDay('day-${day.date}')" role="button" aria-expanded="${isOpen}" tabindex="0">
+          <div class="day-left">
+            <div class="day-num-row">
+              <span class="day-num-label">Day ${day.num}</span>${pillHtml}
+            </div>
+            <div class="day-date-big">${fmtDate(day.date)}</div>
+            <div class="day-sublabel">${day.label}</div>
+            <div class="day-weather-mini" id="wm-${day.date}">
+              <span style="font-size:0.62rem;color:var(--muted)">Loading weather…</span>
+            </div>
+          </div>
+          <div class="day-right">
+            <span class="city-tag ${cityLow}">${day.city}</span>
+            <span class="chevron" aria-hidden="true">▾</span>
+          </div>
+        </div>
+        <div class="day-body">
+          <div class="hotel-strip">
+            <span class="hotel-strip-ico">🏨</span>
+            <span class="hotel-strip-name">${day.hotel}</span>
+            <a href="${mapsUrl(day.hotel)}" target="_blank" class="hotel-strip-link">Map →</a>
+          </div>
+          <div class="timeline">${stopsHtml}</div>
+        </div>
+      </div>`;
+  });
+
+  container.innerHTML = html;
+
+  // Keyboard support
+  container.querySelectorAll('.day-header').forEach(h => {
+    h.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); h.click(); } });
+  });
+
+  // Scroll to today
+  if (today >= TRIP.startDate && today <= TRIP.endDate) {
+    setTimeout(() => {
+      const el = document.getElementById('day-' + today);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 500);
+  }
+}
+
+function toggleDay(id) {
+  const card = document.getElementById(id);
+  const isOpen = card.classList.toggle('open');
+  card.querySelector('.day-header').setAttribute('aria-expanded', isOpen);
+}
+
+// ════════════════════════════════════════════
+// TAB SWITCHING
+// ════════════════════════════════════════════
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected','false'); });
+  document.getElementById('panel-' + name).classList.add('active');
+  const tab = document.getElementById('tab-' + name);
+  tab.classList.add('active');
+  tab.setAttribute('aria-selected','true');
+  if (name === 'weather') loadWeather();
+}
+
+// ════════════════════════════════════════════
+// WEATHER — Open-Meteo (free, no API key)
+// Uses: api.open-meteo.com — 100% free forecast API
+// ════════════════════════════════════════════
+let wxLoaded = false;
+
+async function loadWeather() {
+  if (wxLoaded) return;
+
+  const BASE = 'https://api.open-meteo.com/v1/forecast';
+  const PARAMS = 'daily=temperature_2m_max,temperature_2m_min,weathercode,precipitation_probability_max&timezone=Asia%2FTokyo&forecast_days=16';
+  const TOKYO_URL  = `${BASE}?latitude=35.6762&longitude=139.6503&${PARAMS}`;
+  const KYOTO_URL  = `${BASE}?latitude=35.0116&longitude=135.7681&${PARAMS}`;
+
+  const container = document.getElementById('weather-content');
+
+  try {
+    const [tr, kr] = await Promise.all([fetch(TOKYO_URL), fetch(KYOTO_URL)]);
+    if (!tr.ok || !kr.ok) throw new Error('API error');
+    const [td, kd] = await Promise.all([tr.json(), kr.json()]);
+
+    const buildLookup = d => {
+      const lk = {};
+      if (d.daily) d.daily.time.forEach((dt, i) => {
+        lk[dt] = {
+          max:  Math.round(d.daily.temperature_2m_max[i]),
+          min:  Math.round(d.daily.temperature_2m_min[i]),
+          code: d.daily.weathercode[i],
+          rain: d.daily.precipitation_probability_max?.[i] ?? 0
+        };
+      });
+      return lk;
+    };
+
+    const tl = buildLookup(td), kl = buildLookup(kd);
+    const today = todayJST();
+    let html = '';
+
+    const renderCityWeather = (label, days, lookup) => {
+      let s = `<div class="section-head" style="margin-top:${label==='Tokyo'?'0':'20px'}">${label}</div><div class="weather-grid">`;
+      days.forEach(day => {
+        const w = lookup[day.date];
+        const isT = day.date === today;
+        if (w) {
+          const [ico, desc] = decodeWeather(w.code);
+          s += `<div class="weather-tile${isT?' today-tile':''}">
+            <div class="w-date">${fmtDate(day.date)}</div>
+            <div class="w-icon">${ico}</div>
+            <div class="w-desc">${desc}</div>
+            <div class="w-temps">${w.max}° / ${w.min}°C</div>
+            <div class="w-rain">💧 ${w.rain}%</div>
+          </div>`;
+          // Update mini weather in day card
+          const mini = document.getElementById('wm-' + day.date);
+          if (mini) mini.innerHTML = `<span>${ico}</span><span>${w.max}° / ${w.min}°C</span>`;
+        } else {
+          s += `<div class="weather-tile">
+            <div class="w-date">${fmtDate(day.date)}</div>
+            <div class="w-icon">—</div>
+            <div class="w-desc">No data</div>
+          </div>`;
+        }
+      });
+      return s + '</div>';
+    };
+
+    html += renderCityWeather('Tokyo', TRIP.days.filter(d => d.city === 'Tokyo'), tl);
+    html += renderCityWeather('Kyoto', TRIP.days.filter(d => d.city === 'Kyoto'), kl);
+    html += `<div class="weather-note">Source: Open-Meteo · Free forecast API · No API key required · Refreshes on page load</div>`;
+
+    container.innerHTML = html;
+    wxLoaded = true;
+
+  } catch(err) {
+    // Graceful fallback — no API key instructions needed (Open-Meteo is free)
+    container.innerHTML = `
+      <div class="weather-placeholder">
+        <div style="font-size:2.5rem;margin-bottom:16px">🌸</div>
+        <p><strong>Weather forecast unavailable</strong></p>
+        <p style="margin-top:8px;">April in Tokyo averages 14–22°C — mild days with occasional rain. Cherry blossom season brings clear blue skies and cool evenings. Pack a light jacket and a compact umbrella. Kyoto is typically 2–3°C cooler than Tokyo.</p>
+        <p style="margin-top:10px;font-size:0.65rem;color:var(--muted);">This app uses Open-Meteo (free, no API key). If weather fails, check your internet connection and reload.</p>
+      </div>`;
+  }
+}
+
+// Lightweight mini-weather for day cards on load
+async function loadMiniWeather() {
+  try {
+    const BASE = 'https://api.open-meteo.com/v1/forecast';
+    const P    = 'daily=temperature_2m_max,temperature_2m_min,weathercode&timezone=Asia%2FTokyo&forecast_days=16';
+    const [tr, kr] = await Promise.all([
+      fetch(`${BASE}?latitude=35.6762&longitude=139.6503&${P}`),
+      fetch(`${BASE}?latitude=35.0116&longitude=135.7681&${P}`)
+    ]);
+    const [td, kd] = await Promise.all([tr.json(), kr.json()]);
+
+    const lk = (d) => {
+      const m = {};
+      if (d.daily) d.daily.time.forEach((dt,i) => m[dt] = { max: Math.round(d.daily.temperature_2m_max[i]), min: Math.round(d.daily.temperature_2m_min[i]), code: d.daily.weathercode[i] });
+      return m;
+    };
+    const tl = lk(td), kl = lk(kd);
+
+    TRIP.days.forEach(day => {
+      const w = (day.city === 'Kyoto' ? kl : tl)[day.date];
+      const mini = document.getElementById('wm-' + day.date);
+      if (w && mini) {
+        const [ico] = decodeWeather(w.code);
+        mini.innerHTML = `<span>${ico}</span><span>${w.max}° / ${w.min}°C</span>`;
+      } else if (mini) {
+        mini.innerHTML = '<span style="font-size:0.62rem;color:var(--muted)">🌸 April weather</span>';
+      }
+    });
+  } catch {
+    TRIP.days.forEach(day => {
+      const mini = document.getElementById('wm-' + day.date);
+      if (mini) mini.innerHTML = '<span style="font-size:0.62rem;color:var(--muted)">🌸 April</span>';
+    });
+  }
+}
+
+// ════════════════════════════════════════════
+// CURRENCY CONVERTER
+// ════════════════════════════════════════════
+const RATE = TRIP.jpyPerUsd; // ¥ per $1 — edit TRIP.jpyPerUsd above
+
+function convertFrom(src) {
+  if (src === 'jpy') {
+    const jpy = parseFloat(document.getElementById('jpy-in').value);
+    document.getElementById('usd-in').value = jpy ? (jpy / RATE).toFixed(2) : '';
+  } else {
+    const usd = parseFloat(document.getElementById('usd-in').value);
+    document.getElementById('jpy-in').value = usd ? Math.round(usd * RATE) : '';
+  }
+}
+
+function setJpy(amt) {
+  document.getElementById('jpy-in').value = amt;
+  convertFrom('jpy');
+  document.getElementById('panel-currency').querySelector('.conv-input').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+// ════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════
+function init() {
+  renderDays();
+  updateRibbon();
+  tick();
+  setInterval(tick, 1000);
+  setInterval(updateRibbon, 60000);
+  setTimeout(loadMiniWeather, 700);
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
